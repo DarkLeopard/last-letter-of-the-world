@@ -1,4 +1,5 @@
 <div class="wrapper">
+  <mat-progress-spinner mode="indeterminate" *ngIf="!(isDictReady | async)"></mat-progress-spinner>
   <button *ngIf="(isGameNew$ | async) && (isDictReady | async)" mat-raised-button color="primary"
           (click)="startNewGame()" class="game-button">
     Начать игру
