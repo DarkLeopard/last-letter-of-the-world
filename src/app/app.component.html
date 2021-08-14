@@ -1,24 +1,50 @@
-<mat-card *ngIf="isGameNew$ | async">
-  <mat-card-header>
-    <mat-card-title>Началь игру</mat-card-title>
-  </mat-card-header>
-  <mat-card-actions>
-    <button mat-button (click)="startGame()">Начать</button>
-  </mat-card-actions>
-</mat-card>
+<div class="wrapper">
+  <button *ngIf="(isGameNew$ | async) && (isDictReady | async)" mat-raised-button color="primary"
+          (click)="startNewGame()" class="game-button">
+    Начать игру
+  </button>
 
-<mat-card *ngIf="!(isGameNew$ | async)">
-  <mat-card-content>
-    <mat-form-field appearance="legacy">
-      <input matInput type="text" [formControl]="pcWord">
-      <mat-hint>мое слово, тебе на {{lastLetter}}</mat-hint>
-    </mat-form-field>
-  </mat-card-content>
-  <mat-form-field appearance="legacy">
-    <input matInput type="text" [formControl]="playerWord">
-    <mat-hint>твое слово</mat-hint>
-  </mat-form-field>
-  <mat-card-actions>
-    <button mat-button (click)="playerTurn()">Сходить</button>
-  </mat-card-actions>
-</mat-card>
+  <ng-container *ngIf="!(isGameNew$ | async)">
+    <mat-card>
+      <mat-card-content>
+        <mat-form-field appearance="legacy">
+          <input matInput type="text" [formControl]="pcWord">
+          <mat-hint>мое слово, тебе на <strong>{{pcLastLetter}}</strong></mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+      <ng-container *ngIf="getWordDescription(pcWord.value)">
+        <mat-card-header>
+          <mat-card-title>Что это?</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p [innerText]="getWordDescription(pcWord.value)"></p>
+        </mat-card-content>
+      </ng-container>
+    </mat-card>
+    <mat-card>
+      <mat-card-content>
+        <mat-form-field appearance="outline">
+          <mat-label>Твое слово</mat-label>
+          <input matInput type="text" [formControl]="playerWord">
+          <mat-error *ngIf="playerWord.hasError('notLastLetter')">твоя первая буква - {{pcLastLetter}}</mat-error>
+          <mat-error *ngIf="playerWord.hasError('alreadyUsed')">это слово уже было использовано</mat-error>
+          <mat-error *ngIf="playerWord.hasError('noWordInDict')">такого слова в словаре нет</mat-error>
+        </mat-form-field>
+      </mat-card-content>
+
+      <ng-container *ngIf="getWordDescription(playerWord.value)">
+        <mat-card-header>
+          <mat-card-title>Что это?</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p [innerText]="getWordDescription(playerWord.value)"></p>
+        </mat-card-content>
+      </ng-container>
+    </mat-card>
+    <button mat-raised-button color="primary" (click)="playerTurn()" class="game-button">Сходить</button>
+    <button mat-raised-button color="accent" (click)="getWordHint()" class="game-button">Подсказать</button>
+    <hr>
+    <button mat-raised-button color="warn" (click)="startNewGame()" class="game-button">Начать новую игру</button>
+  </ng-container>
+
+</div>
